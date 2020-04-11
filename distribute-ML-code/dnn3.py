@@ -22,7 +22,7 @@ batch_size = 100
 display_step = 100
 keep_prob = 0.5
 #total_steps = {TOTAL_STEPS}
-total_steps = 5000
+total_steps = 500
 
 # Network Parameters
 n_input = 784 # Number of feature
@@ -94,6 +94,7 @@ def main(_):
                              job_name=FLAGS.job_name,
                              task_index=FLAGS.task_index)
     print("Cluster job: %s, task_index: %d, target: %s" % (FLAGS.job_name, FLAGS.task_index, server.target))
+
     if FLAGS.job_name == "ps":
         server.join()
     elif FLAGS.job_name == "worker":
@@ -108,6 +109,12 @@ def main(_):
                 # Get data ...
                 try:
                     mnist = input_data.read_data_sets("data", one_hot=True)
+                
+                    file_name = "./worker_"+FLAGS.job_name+"_"+FLAGS.task_index+"_mnist.txt"
+                    f1 = open(file_name, 'w')
+                    f1.write(mnist)
+                    f1.close()
+
                 except:
                     time.sleep(3)
 
@@ -211,7 +218,7 @@ def main(_):
         f1.write("\n")
         f1.close()
 
-        file_name = train_logs_dir + "finish-" + socket.gethostname() + "_" + str(FLAGS.job_name) + "_" + str(FLAGS.task_index) + "_time.txt"
+        file_name = train_logs_dir + "finish-" + socket.gethostname()[0:-6]
         f1 = open(file_name, 'w')
         f1.write("useless file... just for a flag that shows the worker finished task...")
         f1.close()
