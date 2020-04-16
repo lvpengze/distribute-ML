@@ -22,7 +22,7 @@ batch_size = 100
 display_step = 100
 keep_prob = 0.5
 #total_steps = {TOTAL_STEPS}
-total_steps = 500
+total_steps = 5000
 
 # Network Parameters
 n_input = 784 # Number of feature
@@ -109,11 +109,6 @@ def main(_):
                 # Get data ...
                 try:
                     mnist = input_data.read_data_sets("data", one_hot=True)
-                
-                    file_name = "./worker_"+FLAGS.job_name+"_"+FLAGS.task_index+"_mnist.txt"
-                    f1 = open(file_name, 'w')
-                    f1.write(mnist)
-                    f1.close()
 
                 except:
                     time.sleep(3)

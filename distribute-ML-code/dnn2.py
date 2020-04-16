@@ -24,7 +24,7 @@ training_epochs = 20
 batch_size = 100
 display_step = 100
 keep_prob = 0.5
-total_steps = {TOTAL_STEPS}
+total_steps = 5000
 
 # Network Parameters
 n_input = 784 # Number of feature
@@ -34,6 +34,9 @@ n_classes = 10 # Number of classes to predict
 
 # checkpoint 目录
 logs_train_dir = "./checkpoint/"
+
+# logs
+train_logs_dir = "/mnt/"
 
 # Create model
 def multilayer_perceptron(x, weights, biases):
@@ -105,13 +108,6 @@ def main(_):
                 try:
                     mnist = input_data.read_data_sets("data", one_hot=True)
 
-                    file_name = "/mnt/" + "mnist_data.txt"
-                    f1 = open(file_name, 'w')
-                    f1.write(mnist)
-                    f1.close()
-
-                    break
-
                 except:
                     time.sleep(3)
 
@@ -151,7 +147,7 @@ def main(_):
             correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y_, 1))
             accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-            saver = tf.train.Saver(max_to_keep=1)
+            saver = tf.train.Saver()
             summary_op = tf.summary.merge_all()
             init_op = tf.initialize_all_variables()
 
@@ -178,7 +174,7 @@ def main(_):
         sv.start_queue_runners(sess)
 
         # Loop until the supervisor shuts down (or total_steps steps have completed).
-        file_name = "/mnt/" + socket.gethostname() + "_" + str(
+        file_name = train_logs_dir + socket.gethostname() + "_" + str(
             FLAGS.job_name) + "_" + str(FLAGS.task_index) + "_time.txt"
         starttime = datetime.datetime.now()
         f1 = open(file_name,'w')
@@ -191,7 +187,7 @@ def main(_):
             batch_xs, batch_ys = mnist.train.next_batch(batch_size)
             _, loss_v, step = sess.run([train_op, cost, global_step], feed_dict={x: batch_xs, y_: batch_ys})
             if step % display_step == 0:
-                # 保存模型
+
                 checkpoint_path = os.path.join(logs_train_dir, './model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
 
@@ -202,7 +198,7 @@ def main(_):
         endtime = datetime.datetime.now()
         print (endtime - starttime).seconds
 
-        file_name = "/mnt/" + socket.gethostname() + "_" + str(
+        file_name = train_logs_dir + socket.gethostname() + "_" + str(
             FLAGS.job_name) + "_" + str(FLAGS.task_index) + "_time.txt"
         #file_name = str(FLAGS.job_name) + "_" + str(task_index) + "_time.txt"
         f1 = open(file_name,'a')
@@ -212,7 +208,7 @@ def main(_):
         f1.write("\n")
         f1.close()
 
-        file_name = "/mnt/" + "finish-" + socket.gethostname() + "_" + str(FLAGS.job_name) + "_" + str(FLAGS.task_index) + "_time.txt"
+        file_name = train_logs_dir + "finish-" + socket.gethostname()[0:-6]
         f1 = open(file_name, 'w')
         f1.write("useless file... just for a flag that shows the worker finished task...")
         f1.close()

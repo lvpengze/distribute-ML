@@ -21,7 +21,7 @@ training_epochs = 20
 batch_size = 100
 display_step = 100
 keep_prob = 0.5
-total_steps = {TOTAL_STEPS}
+total_steps = 5000
 
 # Network Parameters
 n_input = 784 # Number of feature
@@ -31,6 +31,8 @@ n_classes = 10 # Number of classes to predict
 # checkpoints
 logs_train_dir = "./checkpoint/"
 
+# logs
+train_logs_dir = "/mnt/"
 # Create model
 def multilayer_perceptron(x, weights, biases):
     # Hidden layer with RELU activation
@@ -99,13 +101,6 @@ def main(_):
                 try:
                     mnist = input_data.read_data_sets("data", one_hot=True)
 
-                    file_name = "/mnt/" + "mnist_data.txt"
-                    f1 = open(file_name, 'w')
-                    f1.write(mnist)
-                    f1.close()
-
-                    break
-
                 except:
                     time.sleep(3)
 
@@ -146,8 +141,6 @@ def main(_):
             summary_op = tf.summary.merge_all()
             init_op = tf.initialize_all_variables()
 
-            print len(tf.all_variables())
-
         # Create a "Supervisor", which oversees the training process.
         sv = tf.train.Supervisor(is_chief=(FLAGS.task_index == 0),
                                  #logdir="/Users/urey/PycharmProjects/tensorflow_demo/notes/tensorflow/checkpoint/",
@@ -171,7 +164,7 @@ def main(_):
         sv.start_queue_runners(sess)
 
         # Loop until the supervisor shuts down (or total_steps steps have completed).
-        file_name = "/mnt/" + socket.gethostname() + "_" + str(
+        file_name = train_logs_dir + socket.gethostname() + "_" + str(
             FLAGS.job_name) + "_" + str(FLAGS.task_index) + "_time.txt"
         starttime = datetime.datetime.now()
         f1 = open(file_name,'w')
@@ -195,7 +188,7 @@ def main(_):
         endtime = datetime.datetime.now()
         print (endtime - starttime).seconds
 
-        file_name = "/mnt/" + socket.gethostname() + "_" + str(
+        file_name = train_logs_dir + socket.gethostname() + "_" + str(
             FLAGS.job_name) + "_" + str(FLAGS.task_index) + "_time.txt"
         #file_name = str(FLAGS.job_name) + "_" + str(task_index) + "_time.txt"
         f1 = open(file_name,'a')
@@ -205,7 +198,7 @@ def main(_):
         f1.write("\n")
         f1.close()
 
-        file_name = "/mnt/" + "finish-" + socket.gethostname() + "_" + str(FLAGS.job_name) + "_" + str(FLAGS.task_index) + "_time.txt"
+        file_name = train_logs_dir + "finish-" + socket.gethostname()[0:-6]
         f1 = open(file_name, 'w')
         f1.write("useless file... just for a flag that shows the worker finished task...")
         f1.close()
